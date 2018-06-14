@@ -1,5 +1,9 @@
 package bisplit
 
+import (
+  "bytes"
+)
+
 //Calculator handles comparisons and operations on Bisplits
 //of certain dimensions
 type Calculator interface {
@@ -96,6 +100,29 @@ func (sp ModuliSpace) SignedCompatible(a Bisplit, b Bisplit) int {
 //Compatible returns true if a and b are compatible
 func (sp ModuliSpace) Compatible(a Bisplit, b Bisplit) bool {
   return sp.SignedCompatible(a, b) != 0
+}
+
+//String provides a string representation of this Bisplit
+func (sp ModuliSpace) String(a Bisplit) string {
+  var buf bytes.Buffer
+  bitsIntoBuffer(a.W, sp.W, &buf)
+  bitsIntoBuffer(a.B, sp.B, &buf)
+  return buf.String()
+}
+
+func bitsIntoBuffer(val, size uint, buf *bytes.Buffer) {
+  buf.WriteString("{")
+  if size > 0 {
+    for i := uint(0); i < size; i++ {
+      if val%2 == 1 {
+        buf.WriteString("1")
+      } else {
+        buf.WriteString("0")
+      }
+      val >>= 1
+    }
+  }
+  buf.WriteString("}")
 }
 
 //zero out everything except the least significant l bits
