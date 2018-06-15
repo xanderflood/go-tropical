@@ -15,6 +15,8 @@ type Calculator interface {
   StrictlyCompatible(a Bisplit, b Bisplit) bool
   SignedCompatible(a Bisplit, b Bisplit) int
   Compatible(a Bisplit, b Bisplit) bool
+
+  ApplyCanonical(a Bisplit, pct PermutationCycleType) Bisplit
 }
 
 //ModuliSpace implements Calculator
@@ -102,12 +104,43 @@ func (sp ModuliSpace) Compatible(a Bisplit, b Bisplit) bool {
   return sp.SignedCompatible(a, b) != 0
 }
 
+//ApplyCanonical alters a according to the canonical permutation associated with this cycle type
+func (sp ModuliSpace) ApplyCanonical(a Bisplit, pct PermutationCycleType) Bisplit {
+  return Bisplit{
+    W: permuteBitsCanonical(a.W, pct.W),
+    B: permuteBitsCanonical(a.B, pct.B),
+  }
+}
+
 //String provides a string representation of this Bisplit
 func (sp ModuliSpace) String(a Bisplit) string {
   var buf bytes.Buffer
   bitsIntoBuffer(a.W, sp.W, &buf)
   bitsIntoBuffer(a.B, sp.B, &buf)
   return buf.String()
+}
+
+func permuteBitsCanonical(a uint, pct []uint) uint {
+  var chunks []uint
+  for _, c := range pct {
+    chunks = append(chunks, a%(1<<c))
+    a >>= c
+  }
+
+  a = 0
+  l := len(pct)
+  for i := range pct {
+    c := pct[l-i-1]
+    a <<= c
+    a += cycleBits(chunks[l-i-1], c)
+  }
+
+  return a
+}
+
+func cycleBits(a uint, c uint) uint {
+  sign := (a >> (c - 1)) % 2
+  return ((a << 1) % (1 << c)) + sign
 }
 
 func bitsIntoBuffer(val, size uint, buf *bytes.Buffer) {
@@ -133,3 +166,5 @@ func scope(a uint, l uint) uint {
 func reverse(a uint, l uint) uint {
   return scope(^a, l)
 }
+
+var _ Calculator = ModuliSpace{}
