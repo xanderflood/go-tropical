@@ -6,7 +6,7 @@ type Enumerator <-chan Bisplit
 //EnumeratorFactory a function for producing enumerators
 type EnumeratorFactory func(W, B int) Enumerator
 
-//Enumerate the correct sequentiql enumerator
+//Enumerate is the correct sequential enumerator
 func Enumerate(W, B uint) Enumerator {
   bisplitChan := make(chan Bisplit, 3)
 

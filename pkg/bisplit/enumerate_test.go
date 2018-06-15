@@ -21,7 +21,7 @@ var _ = Describe("Enumerate", func() {
 
   var assertAlwaysNormal = func() {
     It("only produces normalized splits", func() {
-      calc := bisplit.BisplitCalculatorImpl{W: W, B: B}
+      calc := bisplit.ModuliSpace{W: W, B: B}
 
       for bs := range enum {
         Expect(calc.IsNormal(bs)).To(BeTrue())
@@ -227,7 +227,7 @@ var _ = Describe("Enumerate", func() {
       //there are (2^w-2)*(2^b-2)/2
       It("produces 450 non-equivalent splits", func() {
         splits := []bisplit.Bisplit{}
-        calc := bisplit.BisplitCalculatorImpl{W: W, B: B}
+        calc := bisplit.ModuliSpace{W: W, B: B}
 
         for bs := range enum {
           for _, bs2 := range splits {
